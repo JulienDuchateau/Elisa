@@ -129,10 +129,11 @@
 
   /* DAILY METRICS (sommeil / hydratation on-off) */
   .day-metrics { display: flex; gap: 10px; margin-top: 2px; padding-top: 9px; border-top: 1px solid var(--border); margin-left: 38px; }
-  .metric-item { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
+  .metric-item { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 3px 0; -webkit-tap-highlight-color: transparent; }
   .metric-icon { font-size: 13px; flex-shrink: 0; width: 13px; text-align: center; }
-  .metric-label { flex: 1; min-width: 0; font-size: 10.5px; color: var(--soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .metric-check { width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
+  .metric-label { flex: 1; min-width: 0; font-size: 10.5px; color: var(--soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.15s; }
+  .metric-item.checked .metric-label { color: var(--clay); font-weight: 500; }
+  .metric-check { width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; flex-shrink: 0; transition: all 0.15s; display: inline-block; }
   .metric-check.checked { background: var(--clay); border-color: var(--clay); }
 
   /* RECAP / STATS LIST */
@@ -396,7 +397,7 @@
 
 <script>
 // ===================== CONFIG =====================
-const WEEK1_START = new Date(2026, 7, 31); // Monday 31 Aug 2026
+const WEEK1_START = new Date(2026, 8, 7); // Monday 7 Sept 2026
 const NUM_WEEKS = 104;
 const DAY_NAMES = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const MONTH_NAMES = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
@@ -614,15 +615,15 @@ function renderDaysGrid(wk) {
     const metrics = document.createElement('div');
     metrics.className = 'day-metrics';
     metrics.innerHTML = `
-      <div class="metric-item">
+      <div class="metric-item${day.sommeil ? ' checked' : ''}" onclick="toggleMetric(${dayIdx},'sommeil')">
         <span class="metric-icon">🌙</span>
         <span class="metric-label">7h de sommeil</span>
-        <button class="metric-check${day.sommeil ? ' checked' : ''}" onclick="toggleMetric(${dayIdx},'sommeil')"></button>
+        <span class="metric-check${day.sommeil ? ' checked' : ''}"></span>
       </div>
-      <div class="metric-item">
+      <div class="metric-item${day.hydratation ? ' checked' : ''}" onclick="toggleMetric(${dayIdx},'hydratation')">
         <span class="metric-icon">💧</span>
         <span class="metric-label">1,5L d'eau</span>
-        <button class="metric-check${day.hydratation ? ' checked' : ''}" onclick="toggleMetric(${dayIdx},'hydratation')"></button>
+        <span class="metric-check${day.hydratation ? ' checked' : ''}"></span>
       </div>
     `;
     card.appendChild(metrics);
@@ -682,8 +683,10 @@ function toggleMetric(dayIdx, field) {
   save();
   renderRings(wk);
   const card = document.getElementById('days-grid').children[dayIdx];
-  const btn = card.querySelectorAll('.metric-check')[field === 'sommeil' ? 0 : 1];
-  btn.classList.toggle('checked', wk.days[dayIdx][field]);
+  const idx = field === 'sommeil' ? 0 : 1;
+  const isOn = wk.days[dayIdx][field];
+  card.querySelectorAll('.metric-item')[idx].classList.toggle('checked', isOn);
+  card.querySelectorAll('.metric-check')[idx].classList.toggle('checked', isOn);
 }
 
 function updateSlotField(dayIdx, slotIdx, field, val) {
