@@ -133,8 +133,10 @@
   .recap-row.done::before { background: var(--clay); }
   .recap-row.inprogress::before { background: var(--honey); }
   .recap-row.empty::before { background: var(--border); }
-  .recap-row.cycle { box-shadow: inset 0 0 0 1.5px rgba(139,90,107,0.4); }
-  .recap-week { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--muted); margin-bottom: 3px; letter-spacing: 0.03em; }
+  .recap-row.cycle { box-shadow: inset 0 0 0 1.5px rgba(139,90,107,0.35); }
+  .recap-week { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--muted); margin-bottom: 3px; letter-spacing: 0.03em; display: flex; align-items: center; gap: 6px; }
+  .cycle-flag { display: inline-flex; align-items: center; gap: 4px; color: var(--plum); font-weight: 500; }
+  .cycle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--plum); flex-shrink: 0; }
   .recap-title { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 500; color: var(--text); }
   .recap-content { flex: 1; }
   .recap-detail { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--soft); margin-top: 4px; display: flex; gap: 10px; }
@@ -704,7 +706,7 @@ function renderStatsPage() {
     row.onclick = () => { currentWeek = w; save(); showPage('sport', document.querySelector('.nav-btn')); document.getElementById('week-label').textContent='Semaine '+w; renderSport(); };
     row.innerHTML = `
       <div class="recap-content">
-        <div class="recap-week">SEMAINE ${w}</div>
+        <div class="recap-week">Semaine ${w}${wk && wk.cycle ? '<span class="cycle-flag"><span class="cycle-dot"></span>cycle</span>' : ''}</div>
         <div class="recap-title">${statusLabel}</div>
         ${stats.hasAnyData ? `<div class="recap-detail">
           <span>${stats.count}/5 activ.</span>
