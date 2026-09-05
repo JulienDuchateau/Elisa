@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SANTÉ — Elisa</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FBF3EA;
+    --bg-warm: #F7ECDF;
+    --card: #FFFDFA;
+    --border: #EBDFD0;
+    --text: #4A3B34;
+    --muted: #A8988C;
+    --soft: #8A7A6E;
+    --clay: #C97B54;
+    --clay-soft: #F3DFCF;
+    --sage: #8A9B6E;
+    --sage-soft: #E7EDDC;
+    --honey: #E3A857;
+    --honey-soft: #F8E7C8;
+    --plum: #8B5A6B;
+    --plum-soft: #F0DFE4;
+    --ring1: #C97B54;
+    --ring2: #8A9B6E;
+    --ring3: #E3A857;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+  /* NAV */
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+  .nav-btn { flex: 1; padding: 10px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10.5px; color: var(--muted); font-family: 'DM Sans', sans-serif; cursor: pointer; transition: color 0.2s; border: none; background: none; }
+  .nav-btn.active { color: var(--clay); }
+  .nav-btn svg { width: 20px; height: 20px; }
+
+  /* PAGES */
+  .page { display: none; padding: 0 0 calc(80px + env(safe-area-inset-bottom)); min-height: 100vh; background: var(--bg); }
+  .page.active { display: block; }
+
+  /* HEADER */
+  .header { padding: env(safe-area-inset-top, 44px) 16px 18px; padding-top: max(44px, env(safe-area-inset-top)); background: var(--bg); position: relative; }
+  .header-eyebrow { font-family: 'Fraunces', serif; font-style: italic; font-weight: 400; font-size: 15px; color: var(--soft); margin-bottom: 4px; text-align: center; }
+  .header-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: clamp(28px, 9vw, 42px); letter-spacing: 0.01em; line-height: 1.05; text-align: center; color: var(--text); }
+  .header-eyebrow-lg { font-size: 19px; }
+  .header-eyebrow-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 2px; }
+  .header-sub { font-size: 12px; color: var(--soft); margin-top: 4px; text-align: center; }
+
+  /* WEEK / MONTH SELECTOR */
+  .week-selector { display: flex; align-items: center; gap: 10px; padding: 0 14px 12px; background: var(--bg); }
+  .week-arrow { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--card); color: var(--clay); font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; border: 1px solid var(--border); }
+  .week-label { flex: 1; text-align: center; font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px; letter-spacing: 0.01em; color: var(--text); }
+
+  /* SECTION */
+  .section { padding: 0 14px; margin-bottom: 16px; }
+  .section-title { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; color: var(--clay); letter-spacing: 0.04em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+  /* BLOCK CARDS */
+  .block { background: var(--card); border-radius: 18px; padding: 18px; margin: 0 14px 14px; box-shadow: 0 2px 14px rgba(160,120,90,0.07); border: 1px solid var(--border); }
+  .block .section-title { margin-bottom: 12px; }
+
+  /* RINGS */
+  .rings-wrap { display: flex; align-items: center; gap: 18px; padding: 4px 0 10px; }
+  .rings-svg { width: 132px; height: 132px; flex-shrink: 0; }
+  .rings-legend { flex: 1; display: flex; flex-direction: column; gap: 10px; }
+  .ring-legend-row { display: flex; align-items: center; gap: 8px; }
+  .ring-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .ring-legend-text { flex: 1; font-size: 12.5px; color: var(--text); }
+  .ring-legend-val { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--soft); white-space: nowrap; }
+  .ring-legend-row.pass .ring-legend-val { color: var(--clay); font-weight: 600; }
+  .ring-check { font-size: 11px; margin-left: 3px; color: var(--clay); }
+  @keyframes ringPulse { 0% { transform: scale(1); } 35% { transform: scale(1.07); } 100% { transform: scale(1); } }
+  .ring-pulse { animation: ringPulse 0.5s ease; }
+
+  .cycle-row { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; margin-top: 4px; border-top: 1px solid var(--border); }
+  .cycle-label { font-size: 13px; color: var(--text); }
+  .cycle-sublabel { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .time-row { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; margin-top: 4px; border-top: 1px solid var(--border); }
+  .time-label { font-size: 13px; color: var(--text); }
+  .time-sublabel { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .time-val { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; color: var(--clay); white-space: nowrap; }
+
+  /* iOS Toggle */
+  .ios-toggle { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+  .ios-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+  .ios-toggle-track { position: absolute; inset: 0; background: var(--border); border-radius: 13px; transition: background 0.25s; cursor: pointer; }
+  .ios-toggle input:checked + .ios-toggle-track { background: var(--plum); }
+  .ios-toggle-thumb { position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: transform 0.25s; pointer-events: none; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+  .ios-toggle input:checked ~ .ios-toggle-thumb { transform: translateX(18px); }
+
+  /* DAY CARDS */
+  .days-grid { display: flex; flex-direction: column; gap: 8px; }
+  .day-card { background: var(--bg-warm); border-radius: 14px; padding: 12px 14px; border-left: 3px solid var(--border); transition: background 0.2s, border-color 0.2s; }
+  .day-card.validated { background: var(--clay-soft); border-left: 3px solid var(--clay); }
+  .day-top { display: flex; align-items: flex-start; gap: 10px; }
+  .day-name { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; color: var(--soft); width: 28px; flex-shrink: 0; padding-top: 5px; }
+  .day-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
+  .slot-row { display: flex; align-items: center; gap: 8px; min-height: 26px; }
+  .slot-add-btn { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: var(--muted); cursor: pointer; padding: 2px 0; border: none; background: none; }
+  .slot-fields { display: flex; align-items: center; gap: 5px; margin-left: auto; flex-shrink: 0; }
+  .field-input { font-family: 'DM Sans', sans-serif; font-size: 12px; background: transparent; border: none; border-bottom: 1.5px solid var(--border); outline: none; padding: 1px 0; text-align: right; color: var(--text); width: 34px; }
+  .field-input:focus { border-bottom-color: var(--clay); }
+  .field-unit { font-family: 'DM Sans', sans-serif; font-size: 10px; color: var(--muted); flex-shrink: 0; }
+  .slot-check { width: 21px; height: 21px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
+  .slot-check.checked { background: var(--clay); border-color: var(--clay); }
+  .slot-remove { font-size: 13px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 0 2px; flex-shrink: 0; }
+
+  /* SEANCE BADGE */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 11px; border-radius: 999px; font-size: 11px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+  .badge-renfo { background: var(--plum-soft); color: #6E3F4F; }
+  .badge-run_ext { background: var(--clay-soft); color: #A15A34; }
+  .badge-tapis { background: var(--honey-soft); color: #A57324; }
+  .badge-stretching { background: var(--sage-soft); color: #5C6E42; }
+  .badge-repos { background: #F0E9DF; color: var(--muted); }
+
+  /* SLIDERS ROW */
+  .day-metrics { display: flex; gap: 14px; margin-top: 2px; padding-top: 9px; border-top: 1px solid var(--border); margin-left: 38px; }
+  .metric-item { flex: 1; display: flex; align-items: center; gap: 7px; }
+  .metric-icon { font-size: 13px; flex-shrink: 0; width: 14px; text-align: center; }
+  .metric-slider { flex: 1; -webkit-appearance: none; appearance: none; height: 3px; border-radius: 2px; background: var(--border); outline: none; }
+  .metric-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--clay); cursor: pointer; }
+  .metric-slider::-moz-range-thumb { width: 14px; height: 14px; border: none; border-radius: 50%; background: var(--clay); cursor: pointer; }
+  .metric-val { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--soft); width: 16px; text-align: right; flex-shrink: 0; }
+
+  /* RECAP / STATS LIST */
+  .recap-list { display: flex; flex-direction: column; gap: 9px; }
+  .recap-row { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 13px 16px 13px 18px; cursor: pointer; position: relative; overflow: hidden; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 10px rgba(160,120,90,0.06); }
+  .recap-row::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--border); }
+  .recap-row.done::before { background: var(--clay); }
+  .recap-row.inprogress::before { background: var(--honey); }
+  .recap-row.empty::before { background: var(--border); }
+  .recap-row.cycle { box-shadow: inset 0 0 0 1.5px rgba(139,90,107,0.4); }
+  .recap-week { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--muted); margin-bottom: 3px; letter-spacing: 0.03em; }
+  .recap-title { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 500; color: var(--text); }
+  .recap-content { flex: 1; }
+  .recap-detail { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--soft); margin-top: 4px; display: flex; gap: 10px; }
+  .recap-badge { font-family: 'DM Sans', sans-serif; font-size: 10px; padding: 4px 10px; border-radius: 20px; font-weight: 600; flex-shrink: 0; }
+  .recap-badge-ok { background: var(--clay); color: #FFFFFF; }
+  .recap-badge-mid { background: var(--honey); color: #FFFFFF; }
+  .recap-badge-empty { background: #F0E9DF; color: var(--muted); }
+
+  /* CALENDRIER */
+  .cal-month-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px; color: var(--text); margin-bottom: 12px; text-align: center; }
+  .cal-grid-header { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 6px; }
+  .cal-grid-header span { font-family: 'DM Sans', sans-serif; font-size: 10px; color: var(--muted); text-align: center; letter-spacing: 0.04em; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal-day { position: relative; display: flex; align-items: center; justify-content: center; height: 40px; font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--text); }
+  .cal-day.empty { color: transparent; }
+  .cal-day svg { display: block; }
+  .cal-legend { display: flex; justify-content: center; gap: 18px; margin-top: 16px; flex-wrap: wrap; }
+  .cal-legend-item { display: flex; align-items: center; gap: 6px; font-family: 'DM Sans', sans-serif; font-size: 10.5px; color: var(--soft); }
+  .cal-legend-item svg { display: block; flex-shrink: 0; }
+
+  /* SAVE BTN */
+  .save-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 28px); margin: 0 14px 14px; padding: 15px; background: var(--clay); border-radius: 999px; border: none; color: #FFFFFF; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.2s; box-shadow: 0 4px 14px rgba(201,123,84,0.3); }
+  .save-btn:active { opacity: 0.85; }
+
+  /* TOAST */
+  .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-20px); background: var(--text); color: var(--bg); padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; opacity: 0; transition: all 0.3s; z-index: 200; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(74,59,52,0.45); z-index: 150; display: none; align-items: flex-end; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg); border-radius: 22px 22px 0 0; width: 100%; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); max-height: 80vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+  .modal-title { font-family: 'Fraunces', serif; font-weight: 500; font-size: 20px; margin-bottom: 14px; color: var(--text); }
+  .seance-option { padding: 13px 16px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 7px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; color: var(--text); background: var(--card); }
+  .seance-option.remove { color: var(--plum); }
+
+  /* DATA TAB */
+  .data-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 15px; background: var(--clay); border-radius: 999px; border: none; color: #FFFFFF; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
+  .data-btn.secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+  .data-btn.danger { background: var(--card); color: var(--plum); border: 1px solid var(--plum-soft); }
+  .file-input-wrap { position: relative; overflow: hidden; display: block; }
+  .file-input-wrap input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  #import-status { font-size: 11px; margin-top: 6px; text-align: center; font-family: 'DM Sans', sans-serif; }
+  .storage-info { font-size: 12px; color: var(--soft); display: flex; flex-direction: column; gap: 6px; }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast">Sauvegardé ✓</div>
+
+<!-- MODAL SLOT -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Choisir une activité</div>
+    <div id="modal-options"></div>
+  </div>
+</div>
+
+<!-- PAGE: SPORT -->
+<div class="page active" id="page-sport">
+  <div class="header">
+    <div class="header-eyebrow-row">
+      <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+        <ellipse cx="16" cy="20" rx="10" ry="8" fill="#C97B54"/>
+        <ellipse cx="16" cy="22" rx="5.5" ry="4.5" fill="#F3DFCF"/>
+        <circle cx="16" cy="10" r="6.5" fill="#C97B54"/>
+        <circle cx="11.5" cy="5.5" r="2.4" fill="#C97B54"/>
+        <circle cx="20.5" cy="5.5" r="2.4" fill="#C97B54"/>
+        <circle cx="13" cy="10" r="1" fill="#4A3B34"/>
+        <circle cx="19" cy="10" r="1" fill="#4A3B34"/>
+        <ellipse cx="16" cy="13" rx="1.6" ry="1.1" fill="#4A3B34"/>
+      </svg>
+      <div class="header-eyebrow header-eyebrow-lg">Suivi Sport & Santé</div>
+    </div>
+  </div>
+
+  <div class="week-selector">
+    <button class="week-arrow" onclick="changeWeek(-1)">‹</button>
+    <div class="week-label" id="week-label">SEMAINE 1</div>
+    <button class="week-arrow" onclick="changeWeek(1)">›</button>
+  </div>
+
+  <div class="block">
+    <div class="section-title">Accomplissement de la semaine</div>
+    <div class="rings-wrap">
+      <svg class="rings-svg" viewBox="0 0 132 132" id="rings-svg">
+        <defs>
+          <linearGradient id="ring1Gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#C97B54"/>
+            <stop offset="100%" stop-color="#E3A857"/>
+          </linearGradient>
+        </defs>
+        <circle cx="66" cy="66" r="58" fill="none" stroke="#EFE3D3" stroke-width="9"/>
+        <circle cx="66" cy="66" r="46" fill="none" stroke="#EFE3D3" stroke-width="9"/>
+        <circle cx="66" cy="66" r="34" fill="none" stroke="#EFE3D3" stroke-width="9"/>
+        <circle id="ring1" cx="66" cy="66" r="58" fill="none" stroke="url(#ring1Gradient)" stroke-width="9" stroke-linecap="round" transform="rotate(-90 66 66)"/>
+        <circle id="ring2" cx="66" cy="66" r="46" fill="none" stroke="var(--ring2)" stroke-width="9" stroke-linecap="round" transform="rotate(-90 66 66)"/>
+        <circle id="ring3" cx="66" cy="66" r="34" fill="none" stroke="var(--ring3)" stroke-width="9" stroke-linecap="round" transform="rotate(-90 66 66)"/>
+      </svg>
+      <div class="rings-legend">
+        <div class="ring-legend-row" id="legend1">
+          <span class="ring-dot" style="background:var(--ring1)"></span>
+          <span class="ring-legend-text">Activités</span>
+          <span class="ring-legend-val" id="legend1-val">0/5</span>
+        </div>
+        <div class="ring-legend-row" id="legend2">
+          <span class="ring-dot" style="background:var(--ring2)"></span>
+          <span class="ring-legend-text">Sommeil</span>
+          <span class="ring-legend-val" id="legend2-val">—/10</span>
+        </div>
+        <div class="ring-legend-row" id="legend3">
+          <span class="ring-dot" style="background:var(--ring3)"></span>
+          <span class="ring-legend-text">Hydratation</span>
+          <span class="ring-legend-val" id="legend3-val">—/10</span>
+        </div>
+      </div>
+    </div>
+    <div class="time-row">
+      <div>
+        <div class="time-label">Temps total d'activité</div>
+        <div class="time-sublabel">Marche/Run + Tapis · cette semaine</div>
+      </div>
+      <div class="time-val" id="time-total-val">—</div>
+    </div>
+    <div class="cycle-row">
+      <div>
+        <div class="cycle-label">Semaine impactée par le cycle</div>
+        <div class="cycle-sublabel">Cochez si applicable</div>
+      </div>
+      <label class="ios-toggle">
+        <input type="checkbox" id="cycle-toggle" onchange="toggleCycle(this.checked)">
+        <span class="ios-toggle-track"></span>
+        <span class="ios-toggle-thumb"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="section-title">Planning de la semaine</div>
+    <div class="days-grid" id="days-grid"></div>
+  </div>
+
+  <button class="save-btn" onclick="save()">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    Sauvegarder la semaine
+  </button>
+</div>
+
+<!-- PAGE: STATS -->
+<div class="page" id="page-stats">
+  <div class="header">
+    <div class="header-eyebrow">Progression</div>
+    <div class="header-title">Statistiques</div>
+    <div class="header-sub">Semaines réussies au fil du temps</div>
+  </div>
+  <div class="section">
+    <div class="recap-list" id="recap-list"></div>
+  </div>
+</div>
+
+<!-- PAGE: CALENDRIER -->
+<div class="page" id="page-calendrier">
+  <div class="header">
+    <div class="header-eyebrow">Vue d'ensemble</div>
+    <div class="header-title">Calendrier</div>
+  </div>
+  <div class="week-selector">
+    <button class="week-arrow" onclick="changeMonth(-1)">‹</button>
+    <div class="week-label" id="cal-month-label">MOIS</div>
+    <button class="week-arrow" onclick="changeMonth(1)">›</button>
+  </div>
+  <div class="section">
+    <div class="cal-grid-header"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-legend">
+      <div class="cal-legend-item"><svg width="16" height="16" viewBox="0 0 28 28"><polygon points="14,2 26,14 14,26 2,14" fill="none" stroke="#8A7A6E" stroke-width="1.5"/></svg> Tapis</div>
+      <div class="cal-legend-item"><svg width="16" height="16" viewBox="0 0 28 28"><rect x="3" y="3" width="22" height="22" rx="3" fill="none" stroke="#8A7A6E" stroke-width="1.5"/></svg> Marche/Run Ext</div>
+      <div class="cal-legend-item"><svg width="16" height="16" viewBox="0 0 28 28"><polygon points="14,2 26,24 2,24" fill="none" stroke="#8A7A6E" stroke-width="1.5" stroke-linejoin="round"/></svg> Renfo</div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: DATA -->
+<div class="page" id="page-data">
+  <div class="header">
+    <div class="header-eyebrow">Sauvegarde</div>
+    <div class="header-title">Mes données</div>
+  </div>
+  <div class="section">
+    <div class="block">
+      <div class="section-title">Export</div>
+      <button class="data-btn" onclick="exportData()">Je sauvegarde mes données</button>
+    </div>
+    <div class="block">
+      <div class="section-title">Import</div>
+      <label class="file-input-wrap">
+        <button class="data-btn secondary" type="button">Charger une sauvegarde</button>
+        <input type="file" accept="application/json" onchange="importData(event)">
+      </label>
+      <div id="import-status"></div>
+    </div>
+    <div class="block">
+      <div class="section-title">Stockage</div>
+      <div class="storage-info" id="storage-info"></div>
+    </div>
+    <div class="block">
+      <div class="section-title">Réinitialisation</div>
+      <button class="data-btn danger" onclick="resetData()">Effacer toutes les données</button>
+    </div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="showPage('sport', this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Sport
+  </button>
+  <button class="nav-btn" onclick="showPage('stats', this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Stats
+  </button>
+  <button class="nav-btn" onclick="showPage('calendrier', this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="12" cy="15" r="1.5"/></svg>
+    Calendrier
+  </button>
+  <button class="nav-btn" onclick="showPage('data', this)">
+    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v6c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6"/></svg>
+    Data
+  </button>
+</div>
+
+<script>
+// ===================== CONFIG =====================
+const WEEK1_START = new Date(2026, 7, 31); // Monday 31 Aug 2026
+const NUM_WEEKS = 104;
+const DAY_NAMES = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const MONTH_NAMES = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+const ACTIVITY_TYPES = {
+  renfo:      { label: 'Renfo',            kind: 'check', badgeClass: 'badge-renfo' },
+  run_ext:    { label: 'Marche/Run Ext',   kind: 'timed', badgeClass: 'badge-run_ext' },
+  tapis:      { label: 'Marche Tapis',     kind: 'timed', badgeClass: 'badge-tapis' },
+  stretching: { label: 'Stretching',       kind: 'check', badgeClass: 'badge-stretching' },
+  repos:      { label: 'Repos',            kind: 'check', badgeClass: 'badge-repos' }
+};
+const CAL_SYMBOLS = { tapis: 'tapis', run_ext: 'run_ext', renfo: 'renfo' };
+
+// ===================== STATE =====================
+let data = { weeks: {} };
+let currentWeek = 1;
+let currentMonthOffset = 0; // relative to today's month
+let modalCtx = null; // { dayIdx, slotIdx }
+
+function defaultSlot() { return { type: null, done: false, duree: '', km: '' }; }
+function defaultDay() { return { slots: [defaultSlot(), defaultSlot()], sommeil: null, hydratation: null }; }
+function defaultWeek() { return { days: Array.from({length:7}, defaultDay), cycle: false }; }
+
+function getWeek(w) {
+  const key = 'w' + w;
+  if (!data.weeks[key]) data.weeks[key] = defaultWeek();
+  // backfill in case of older/partial data
+  const wk = data.weeks[key];
+  if (!wk.days) wk.days = Array.from({length:7}, defaultDay);
+  wk.days.forEach(d => { if (!d.slots) d.slots = [defaultSlot(), defaultSlot()]; });
+  return wk;
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem('elisa_data');
+    if (raw) data = JSON.parse(raw);
+  } catch(e) { data = { weeks: {} }; }
+  if (!data.weeks) data.weeks = {};
+}
+function save() {
+  localStorage.setItem('elisa_data', JSON.stringify(data));
+  localStorage.setItem('elisa_current_week', String(currentWeek));
+  showToast();
+}
+let toastTimer = null;
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 900);
+}
+
+function parseNum(v) {
+  if (v === '' || v === null || v === undefined) return 0;
+  const n = parseFloat(String(v).replace(',', '.'));
+  return isNaN(n) ? 0 : n;
+}
+
+function isSlotValidated(slot) {
+  if (!slot.type) return false;
+  const cfg = ACTIVITY_TYPES[slot.type];
+  if (cfg.kind === 'check') return !!slot.done;
+  return parseNum(slot.duree) > 0 || parseNum(slot.km) > 0;
+}
+
+function computeWeekMinutes(wk) {
+  let total = 0;
+  wk.days.forEach(d => {
+    d.slots.forEach(s => {
+      if ((s.type === 'run_ext' || s.type === 'tapis') && isSlotValidated(s)) {
+        total += parseNum(s.duree);
+      }
+    });
+  });
+  return total;
+}
+function formatDuration(totalMin) {
+  if (totalMin <= 0) return '—';
+  if (totalMin < 60) return Math.round(totalMin) + ' min';
+  const h = Math.floor(totalMin / 60);
+  const m = Math.round(totalMin % 60);
+  return h + 'h' + (m > 0 ? String(m).padStart(2, '0') : '');
+}
+
+function computeWeekStats(wk) {
+  let count = 0;
+  const sommeilVals = [], hydraVals = [];
+  wk.days.forEach(d => {
+    d.slots.forEach(s => { if (isSlotValidated(s) && s.type !== 'repos') count++; });
+    if (d.sommeil !== null && d.sommeil !== undefined) sommeilVals.push(d.sommeil);
+    if (d.hydratation !== null && d.hydratation !== undefined) hydraVals.push(d.hydratation);
+  });
+  const avgSommeil = sommeilVals.length ? sommeilVals.reduce((a,b)=>a+b,0)/sommeilVals.length : 0;
+  const avgHydra = hydraVals.length ? hydraVals.reduce((a,b)=>a+b,0)/hydraVals.length : 0;
+  const pass1 = count >= 5;
+  const pass2 = avgSommeil >= 6.5;
+  const pass3 = avgHydra >= 7;
+  const hasAnyData = count > 0 || sommeilVals.length > 0 || hydraVals.length > 0;
+  return { count, avgSommeil, avgHydra, pass1, pass2, pass3, success: pass1 && pass2 && pass3, hasAnyData };
+}
+
+// ===================== WEEK NAV =====================
+function changeWeek(delta) {
+  const nw = currentWeek + delta;
+  if (nw < 1 || nw > NUM_WEEKS) return;
+  currentWeek = nw;
+  document.getElementById('week-label').textContent = 'Semaine ' + currentWeek;
+  save();
+  renderSport();
+}
+
+// ===================== RENDER: SPORT =====================
+function renderSport() {
+  const wk = getWeek(currentWeek);
+  document.getElementById('cycle-toggle').checked = !!wk.cycle;
+  renderRings(wk);
+  renderDaysGrid(wk);
+}
+
+function renderRings(wk) {
+  const stats = computeWeekStats(wk);
+  const circumferences = { ring1: 2*Math.PI*58, ring2: 2*Math.PI*46, ring3: 2*Math.PI*34 };
+  const pct1 = Math.min(stats.count/5, 1);
+  const pct2 = Math.min(stats.avgSommeil/10, 1);
+  const pct3 = Math.min(stats.avgHydra/10, 1);
+
+  setRing('ring1', circumferences.ring1, pct1);
+  setRing('ring2', circumferences.ring2, pct2);
+  setRing('ring3', circumferences.ring3, pct3);
+
+  document.getElementById('legend1-val').textContent = stats.count + '/5';
+  document.getElementById('legend2-val').textContent = (stats.avgSommeil ? stats.avgSommeil.toFixed(1) : '—') + '/10';
+  document.getElementById('legend3-val').textContent = (stats.avgHydra ? stats.avgHydra.toFixed(1) : '—') + '/10';
+
+  setLegendPass('legend1', stats.pass1);
+  setLegendPass('legend2', stats.pass2);
+  setLegendPass('legend3', stats.pass3);
+
+  document.getElementById('time-total-val').textContent = formatDuration(computeWeekMinutes(wk));
+}
+function setRing(id, circumference, pct) {
+  const el = document.getElementById(id);
+  const wasFull = el.dataset.full === '1';
+  const nowFull = pct >= 1;
+  el.setAttribute('stroke-dasharray', circumference.toFixed(2));
+  el.setAttribute('stroke-dashoffset', (circumference * (1-pct)).toFixed(2));
+  if (nowFull && !wasFull) {
+    el.classList.remove('ring-pulse'); void el.offsetWidth; el.classList.add('ring-pulse');
+  }
+  el.dataset.full = nowFull ? '1' : '0';
+}
+function setLegendPass(id, pass) {
+  const el = document.getElementById(id);
+  el.classList.toggle('pass', pass);
+  const valEl = document.getElementById(id+'-val');
+  const existingCheck = el.querySelector('.ring-check');
+  if (pass && !existingCheck) {
+    const span = document.createElement('span');
+    span.className = 'ring-check';
+    span.textContent = '✓';
+    valEl.after(span);
+  } else if (!pass && existingCheck) {
+    existingCheck.remove();
+  }
+}
+
+function toggleCycle(checked) {
+  const wk = getWeek(currentWeek);
+  wk.cycle = checked;
+  save();
+}
+
+function renderDaysGrid(wk) {
+  const grid = document.getElementById('days-grid');
+  grid.innerHTML = '';
+  wk.days.forEach((day, dayIdx) => {
+    const validatedCount = day.slots.filter(isSlotValidated).length;
+    const card = document.createElement('div');
+    card.className = 'day-card' + (validatedCount > 0 ? ' validated' : '');
+
+    const top = document.createElement('div');
+    top.className = 'day-top';
+    top.innerHTML = `<div class="day-name">${DAY_NAMES[dayIdx]}</div>`;
+
+    const content = document.createElement('div');
+    content.className = 'day-content';
+    day.slots.forEach((slot, slotIdx) => {
+      content.appendChild(renderSlotRow(dayIdx, slotIdx, slot));
+    });
+    top.appendChild(content);
+    card.appendChild(top);
+
+    const metrics = document.createElement('div');
+    metrics.className = 'day-metrics';
+    metrics.innerHTML = `
+      <div class="metric-item">
+        <span class="metric-icon">🌙</span>
+        <input type="range" min="1" max="10" step="1" class="metric-slider" value="${day.sommeil || 5}" oninput="updateMetric(${dayIdx},'sommeil',this.value)">
+        <span class="metric-val">${day.sommeil !== null && day.sommeil !== undefined ? day.sommeil : '—'}</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-icon">💧</span>
+        <input type="range" min="1" max="10" step="1" class="metric-slider" value="${day.hydratation || 5}" oninput="updateMetric(${dayIdx},'hydratation',this.value)">
+        <span class="metric-val">${day.hydratation !== null && day.hydratation !== undefined ? day.hydratation : '—'}</span>
+      </div>
+    `;
+    card.appendChild(metrics);
+    grid.appendChild(card);
+  });
+}
+
+function renderSlotRow(dayIdx, slotIdx, slot) {
+  const row = document.createElement('div');
+  row.className = 'slot-row';
+  if (!slot.type) {
+    row.innerHTML = `<button class="slot-add-btn" onclick="openSlotModal(${dayIdx},${slotIdx})">+ Ajouter une activité</button>`;
+    return row;
+  }
+  const cfg = ACTIVITY_TYPES[slot.type];
+  const badge = document.createElement('span');
+  badge.className = 'badge ' + cfg.badgeClass;
+  badge.textContent = cfg.label;
+  badge.onclick = () => openSlotModal(dayIdx, slotIdx);
+  row.appendChild(badge);
+
+  if (cfg.kind === 'check') {
+    const btn = document.createElement('button');
+    btn.className = 'slot-check' + (slot.done ? ' checked' : '');
+    btn.style.marginLeft = 'auto';
+    btn.onclick = () => toggleSlotDone(dayIdx, slotIdx);
+    row.appendChild(btn);
+  } else {
+    const fields = document.createElement('div');
+    fields.className = 'slot-fields';
+    fields.innerHTML = `
+      <input class="field-input" type="text" inputmode="decimal" placeholder="0" value="${slot.duree}" onchange="updateSlotField(${dayIdx},${slotIdx},'duree',this.value)">
+      <span class="field-unit">min</span>
+      <input class="field-input" type="text" inputmode="decimal" placeholder="0" value="${slot.km}" onchange="updateSlotField(${dayIdx},${slotIdx},'km',this.value)">
+      <span class="field-unit">km</span>
+    `;
+    row.appendChild(fields);
+  }
+  return row;
+}
+
+function updateMetric(dayIdx, field, val) {
+  const wk = getWeek(currentWeek);
+  wk.days[dayIdx][field] = parseInt(val, 10);
+  save();
+  renderRings(wk);
+  const card = document.getElementById('days-grid').children[dayIdx];
+  const valEl = card.querySelectorAll('.metric-val')[field === 'sommeil' ? 0 : 1];
+  valEl.textContent = val;
+}
+
+function updateSlotField(dayIdx, slotIdx, field, val) {
+  const wk = getWeek(currentWeek);
+  wk.days[dayIdx].slots[slotIdx][field] = val;
+  save();
+  renderRings(wk);
+  const card = document.getElementById('days-grid').children[dayIdx];
+  card.classList.toggle('validated', wk.days[dayIdx].slots.some(isSlotValidated));
+}
+
+function toggleSlotDone(dayIdx, slotIdx) {
+  const wk = getWeek(currentWeek);
+  const slot = wk.days[dayIdx].slots[slotIdx];
+  slot.done = !slot.done;
+  save();
+  renderDaysGrid(wk);
+  renderRings(wk);
+}
+
+// ===================== MODAL =====================
+function openSlotModal(dayIdx, slotIdx) {
+  modalCtx = { dayIdx, slotIdx };
+  const wk = getWeek(currentWeek);
+  const slot = wk.days[dayIdx].slots[slotIdx];
+  const optsWrap = document.getElementById('modal-options');
+  optsWrap.innerHTML = '';
+  Object.entries(ACTIVITY_TYPES).forEach(([key, cfg]) => {
+    const opt = document.createElement('div');
+    opt.className = 'seance-option';
+    opt.textContent = cfg.label;
+    opt.onclick = () => selectSlotType(key);
+    optsWrap.appendChild(opt);
+  });
+  if (slot.type) {
+    const remove = document.createElement('div');
+    remove.className = 'seance-option remove';
+    remove.textContent = 'Retirer cette activité';
+    remove.onclick = () => selectSlotType(null);
+    optsWrap.appendChild(remove);
+  }
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  modalCtx = null;
+}
+function selectSlotType(type) {
+  if (!modalCtx) return;
+  const { dayIdx, slotIdx } = modalCtx;
+  const wk = getWeek(currentWeek);
+  wk.days[dayIdx].slots[slotIdx] = type ? { type, done: false, duree: '', km: '' } : defaultSlot();
+  closeModal();
+  save();
+  renderDaysGrid(wk);
+  renderRings(wk);
+}
+document.getElementById('modal').addEventListener('click', (e) => {
+  if (e.target.id === 'modal') closeModal();
+});
+
+// ===================== RENDER: STATS =====================
+function renderStatsPage() {
+  const list = document.getElementById('recap-list');
+  list.innerHTML = '';
+  for (let w = 1; w <= NUM_WEEKS; w++) {
+    const key = 'w' + w;
+    const wk = data.weeks[key];
+    const row = document.createElement('div');
+    const stats = wk ? computeWeekStats(wk) : { hasAnyData: false };
+    let statusClass = 'empty', badgeClass = 'recap-badge-empty', badgeText = 'Vide', statusLabel = 'Aucune donnée';
+    if (stats.hasAnyData) {
+      if (stats.success) { statusClass = 'done'; badgeClass = 'recap-badge-ok'; badgeText = 'Réussie'; statusLabel = 'Objectifs atteints'; }
+      else { statusClass = 'inprogress'; badgeClass = 'recap-badge-mid'; badgeText = 'En cours'; statusLabel = 'En cours'; }
+    }
+    row.className = 'recap-row ' + statusClass + (wk && wk.cycle ? ' cycle' : '');
+    row.onclick = () => { currentWeek = w; save(); showPage('sport', document.querySelector('.nav-btn')); document.getElementById('week-label').textContent='Semaine '+w; renderSport(); };
+    row.innerHTML = `
+      <div class="recap-content">
+        <div class="recap-week">SEMAINE ${w}</div>
+        <div class="recap-title">${statusLabel}</div>
+        ${stats.hasAnyData ? `<div class="recap-detail">
+          <span>${stats.count}/5 activ.</span>
+          <span>${stats.avgSommeil ? stats.avgSommeil.toFixed(1) : '—'} sommeil</span>
+          <span>${stats.avgHydra ? stats.avgHydra.toFixed(1) : '—'} hydrat.</span>
+        </div>` : ''}
+      </div>
+      <div class="recap-badge ${badgeClass}">${badgeText}</div>
+    `;
+    list.appendChild(row);
+    if (!wk && w > currentWeek + 8) break; // stop listing far-future empty weeks
+  }
+}
+
+// ===================== RENDER: CALENDRIER =====================
+function dateForWeekDay(w, dayIdx) {
+  const d = new Date(WEEK1_START);
+  d.setDate(d.getDate() + (w-1)*7 + dayIdx);
+  return d;
+}
+function weekDayForDate(date) {
+  const diffDays = Math.round((date - WEEK1_START) / 86400000);
+  const w = Math.floor(diffDays/7) + 1;
+  const dayIdx = ((diffDays % 7) + 7) % 7;
+  return { w, dayIdx };
+}
+function renderCalendrier() {
+  const base = new Date();
+  const displayMonth = new Date(base.getFullYear(), base.getMonth() + currentMonthOffset, 1);
+  document.getElementById('cal-month-label').textContent = MONTH_NAMES[displayMonth.getMonth()] + ' ' + displayMonth.getFullYear();
+
+  const firstDay = new Date(displayMonth.getFullYear(), displayMonth.getMonth(), 1);
+  const startOffset = (firstDay.getDay() + 6) % 7; // Monday=0
+  const daysInMonth = new Date(displayMonth.getFullYear(), displayMonth.getMonth()+1, 0).getDate();
+  const today = new Date();
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  for (let i = 0; i < startOffset; i++) {
+    const empty = document.createElement('div');
+    empty.className = 'cal-day empty';
+    grid.appendChild(empty);
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(displayMonth.getFullYear(), displayMonth.getMonth(), d);
+    const { w, dayIdx } = weekDayForDate(date);
+    const isToday = date.toDateString() === today.toDateString();
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (isToday ? ' today' : '');
+    let shape = null;
+    if (w >= 1 && w <= NUM_WEEKS && data.weeks['w'+w]) {
+      const day = data.weeks['w'+w].days[dayIdx];
+      const validatedTypes = day.slots.filter(isSlotValidated).map(s => s.type);
+      for (const key of Object.keys(CAL_SYMBOLS)) {
+        if (validatedTypes.includes(key)) { shape = key; break; }
+      }
+    }
+    cell.innerHTML = calDaySymbol(shape, d, isToday);
+    grid.appendChild(cell);
+  }
+}
+// Sober monochrome outline shapes with the day number centered inside
+function calDaySymbol(shape, num, isToday) {
+  const stroke = isToday ? '#C97B54' : '#8A7A6E';
+  const sw = isToday ? 1.8 : 1.3;
+  const fontWeight = isToday ? '700' : '400';
+  let shapeEl = '';
+  if (shape === 'tapis') {
+    shapeEl = `<polygon points="14,2 26,14 14,26 2,14" fill="none" stroke="${stroke}" stroke-width="${sw}"/>`;
+  } else if (shape === 'run_ext') {
+    shapeEl = `<rect x="3" y="3" width="22" height="22" rx="3" fill="none" stroke="${stroke}" stroke-width="${sw}"/>`;
+  } else if (shape === 'renfo') {
+    shapeEl = `<polygon points="14,2 26,24 2,24" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  }
+  return `<svg width="28" height="28" viewBox="0 0 28 28">${shapeEl}<text x="14" y="18" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="10.5" font-weight="${fontWeight}" fill="#4A3B34">${num}</text></svg>`;
+}
+function changeMonth(delta) {
+  currentMonthOffset += delta;
+  renderCalendrier();
+}
+
+// ===================== DATA TAB =====================
+function exportData() {
+  const exportObj = { version: 1, exportedAt: new Date().toISOString(), data: {} };
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    exportObj.data[key] = localStorage.getItem(key);
+  }
+  const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'BackUp Elisa.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const status = document.getElementById('import-status');
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const obj = JSON.parse(e.target.result);
+      if (!obj.data) throw new Error('Format invalide');
+      Object.entries(obj.data).forEach(([k, v]) => localStorage.setItem(k, v));
+      load();
+      const savedWeek = parseInt(localStorage.getItem('elisa_current_week') || '1');
+      if (savedWeek >= 1 && savedWeek <= NUM_WEEKS) currentWeek = savedWeek;
+      document.getElementById('week-label').textContent = 'Semaine ' + currentWeek;
+      renderSport();
+      updateStorageInfo();
+      status.style.color = '#8A9B6E';
+      status.textContent = '✅ Données restaurées avec succès !';
+    } catch(err) {
+      status.style.color = '#8B5A6B';
+      status.textContent = '❌ Fichier invalide ou corrompu.';
+    }
+  };
+  reader.readAsText(file);
+}
+function resetData() {
+  if (!confirm('Effacer TOUTES les données ? Cette action est irréversible.')) return;
+  localStorage.clear();
+  data = { weeks: {} };
+  currentWeek = 1;
+  document.getElementById('week-label').textContent = 'Semaine 1';
+  renderSport();
+  updateStorageInfo();
+  alert('Données effacées.');
+}
+function updateStorageInfo() {
+  const el = document.getElementById('storage-info');
+  if (!el) return;
+  const keys = localStorage.length;
+  let size = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    size += (localStorage.key(i).length + (localStorage.getItem(localStorage.key(i)) || '').length) * 2;
+  }
+  const kb = (size / 1024).toFixed(1);
+  const weeksWithData = Object.keys(data.weeks).length;
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between"><span>Clés stockées</span><span style="color:#4A3B34;font-weight:600">${keys}</span></div>
+    <div style="display:flex;justify-content:space-between"><span>Semaines remplies</span><span style="color:#4A3B34;font-weight:600">${weeksWithData}</span></div>
+    <div style="display:flex;justify-content:space-between"><span>Taille estimée</span><span style="color:#8A7A6E;font-weight:600">${kb} Ko</span></div>
+  `;
+}
+
+// ===================== NAV =====================
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (name === 'stats') renderStatsPage();
+  if (name === 'calendrier') renderCalendrier();
+  if (name === 'data') updateStorageInfo();
+}
+
+// ===================== INIT =====================
+load();
+const savedWeek = parseInt(localStorage.getItem('elisa_current_week') || '1');
+if (savedWeek >= 1 && savedWeek <= NUM_WEEKS) currentWeek = savedWeek;
+document.getElementById('week-label').textContent = 'Semaine ' + currentWeek;
+renderSport();
+</script>
+</body>
+</html>
