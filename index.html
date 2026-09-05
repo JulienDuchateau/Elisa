@@ -24,6 +24,7 @@
     --honey-soft: #F8E7C8;
     --plum: #8B5A6B;
     --plum-soft: #F0DFE4;
+    --slate: #7D8C93;
     --ring1: #C97B54;
     --ring2: #8A9B6E;
     --ring3: #E3A857;
@@ -69,6 +70,7 @@
   .ring-legend-row { display: flex; align-items: center; gap: 8px; }
   .ring-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .ring-legend-text { flex: 1; font-size: 12.5px; color: var(--text); }
+  .ring-legend-goal { font-size: 10px; color: var(--muted); font-weight: 400; margin-left: 4px; }
   .ring-legend-val { font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--soft); white-space: nowrap; }
   .ring-legend-row.pass .ring-legend-val { color: var(--clay); font-weight: 600; }
   .ring-check { font-size: 11px; margin-left: 3px; color: var(--clay); }
@@ -122,17 +124,16 @@
   .badge-renfo { background: var(--plum-soft); color: #6E3F4F; }
   .badge-run_ext { background: var(--clay-soft); color: #A15A34; }
   .badge-tapis { background: var(--honey-soft); color: #A57324; }
-  .badge-stretching { background: var(--sage-soft); color: #5C6E42; }
+  .badge-yoga { background: var(--sage-soft); color: #5C6E42; }
   .badge-repos { background: #F0E9DF; color: var(--muted); }
 
-  /* SLIDERS ROW */
+  /* DAILY METRICS (sommeil / hydratation on-off) */
   .day-metrics { display: flex; gap: 10px; margin-top: 2px; padding-top: 9px; border-top: 1px solid var(--border); margin-left: 38px; }
   .metric-item { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
   .metric-icon { font-size: 13px; flex-shrink: 0; width: 13px; text-align: center; }
-  .metric-slider { flex: 1; min-width: 0; width: 100%; -webkit-appearance: none; appearance: none; height: 3px; border-radius: 2px; background: var(--border); outline: none; }
-  .metric-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--clay); cursor: pointer; }
-  .metric-slider::-moz-range-thumb { width: 14px; height: 14px; border: none; border-radius: 50%; background: var(--clay); cursor: pointer; }
-  .metric-val { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--soft); width: 14px; text-align: right; flex-shrink: 0; }
+  .metric-label { flex: 1; min-width: 0; font-size: 10.5px; color: var(--soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .metric-check { width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
+  .metric-check.checked { background: var(--clay); border-color: var(--clay); }
 
   /* RECAP / STATS LIST */
   .recap-list { display: flex; flex-direction: column; gap: 9px; }
@@ -145,6 +146,8 @@
   .recap-week { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--muted); margin-bottom: 3px; letter-spacing: 0.03em; display: flex; align-items: center; gap: 6px; }
   .cycle-flag { display: inline-flex; align-items: center; gap: 4px; color: var(--plum); font-weight: 500; }
   .cycle-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--plum); flex-shrink: 0; }
+  .sick-flag { display: inline-flex; align-items: center; gap: 4px; color: var(--slate); font-weight: 500; }
+  .sick-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--slate); flex-shrink: 0; }
   .recap-title { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 500; color: var(--text); }
   .recap-content { flex: 1; }
   .recap-detail { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--soft); margin-top: 4px; display: flex; gap: 10px; }
@@ -255,20 +258,20 @@
         </div>
         <div class="ring-legend-row" id="legend2">
           <span class="ring-dot" style="background:var(--ring2)"></span>
-          <span class="ring-legend-text">Sommeil</span>
-          <span class="ring-legend-val" id="legend2-val">—/10</span>
+          <span class="ring-legend-text">Sommeil <span class="ring-legend-goal">7h/nuit</span></span>
+          <span class="ring-legend-val" id="legend2-val">0/7</span>
         </div>
         <div class="ring-legend-row" id="legend3">
           <span class="ring-dot" style="background:var(--ring3)"></span>
-          <span class="ring-legend-text">Hydratation</span>
-          <span class="ring-legend-val" id="legend3-val">—/10</span>
+          <span class="ring-legend-text">Hydratation <span class="ring-legend-goal">1,5L/jour</span></span>
+          <span class="ring-legend-val" id="legend3-val">0/7</span>
         </div>
       </div>
     </div>
     <div class="time-row">
       <div>
         <div class="time-label">Temps total d'activité</div>
-        <div class="time-sublabel">Marche/Run + Tapis · cette semaine</div>
+        <div class="time-sublabel">Marche/Run, Tapis, Renfo, Yoga · cette semaine</div>
       </div>
       <div class="time-val" id="time-total-val">—</div>
     </div>
@@ -279,6 +282,17 @@
       </div>
       <label class="ios-toggle">
         <input type="checkbox" id="cycle-toggle" onchange="toggleCycle(this.checked)">
+        <span class="ios-toggle-track"></span>
+        <span class="ios-toggle-thumb"></span>
+      </label>
+    </div>
+    <div class="cycle-row">
+      <div>
+        <div class="cycle-label">Semaine impactée par une maladie</div>
+        <div class="cycle-sublabel">Cochez si applicable</div>
+      </div>
+      <label class="ios-toggle">
+        <input type="checkbox" id="sick-toggle" onchange="toggleSick(this.checked)">
         <span class="ios-toggle-track"></span>
         <span class="ios-toggle-thumb"></span>
       </label>
@@ -326,6 +340,7 @@
       <div class="cal-legend-item"><svg width="16" height="16" viewBox="0 0 28 28"><polygon points="14,2 26,14 14,26 2,14" fill="none" stroke="#8A7A6E" stroke-width="1.5"/></svg> Tapis</div>
       <div class="cal-legend-item"><svg width="16" height="16" viewBox="0 0 28 28"><rect x="3" y="3" width="22" height="22" rx="3" fill="none" stroke="#8A7A6E" stroke-width="1.5"/></svg> Marche/Run Ext</div>
       <div class="cal-legend-item"><svg width="16" height="16" viewBox="0 0 28 28"><polygon points="14,2 26,24 2,24" fill="none" stroke="#8A7A6E" stroke-width="1.5" stroke-linejoin="round"/></svg> Renfo</div>
+      <div class="cal-legend-item"><svg width="16" height="16" viewBox="0 0 28 28"><circle cx="14" cy="14" r="11" fill="none" stroke="#8A7A6E" stroke-width="1.5"/></svg> Yoga</div>
     </div>
   </div>
 </div>
@@ -387,13 +402,13 @@ const DAY_NAMES = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const MONTH_NAMES = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
 const ACTIVITY_TYPES = {
-  renfo:      { label: 'Renfo',            kind: 'check', badgeClass: 'badge-renfo' },
+  renfo:      { label: 'Renfo',            kind: 'check_duration', badgeClass: 'badge-renfo' },
   run_ext:    { label: 'Marche/Run Ext',   kind: 'timed', badgeClass: 'badge-run_ext' },
   tapis:      { label: 'Marche Tapis',     kind: 'timed', badgeClass: 'badge-tapis' },
-  stretching: { label: 'Stretching',       kind: 'check', badgeClass: 'badge-stretching' },
+  yoga:       { label: 'Yoga',             kind: 'check_duration', badgeClass: 'badge-yoga' },
   repos:      { label: 'Repos',            kind: 'check', badgeClass: 'badge-repos' }
 };
-const CAL_SYMBOLS = { tapis: 'tapis', run_ext: 'run_ext', renfo: 'renfo' };
+const CAL_SYMBOLS = { tapis: 'tapis', run_ext: 'run_ext', renfo: 'renfo', yoga: 'yoga' };
 
 // ===================== STATE =====================
 let data = { weeks: {} };
@@ -402,8 +417,8 @@ let currentMonthOffset = 0; // relative to today's month
 let modalCtx = null; // { dayIdx, slotIdx }
 
 function defaultSlot() { return { type: null, done: false, duree: '', km: '' }; }
-function defaultDay() { return { slots: [defaultSlot(), defaultSlot()], sommeil: null, hydratation: null }; }
-function defaultWeek() { return { days: Array.from({length:7}, defaultDay), cycle: false }; }
+function defaultDay() { return { slots: [defaultSlot(), defaultSlot()], sommeil: false, hydratation: false }; }
+function defaultWeek() { return { days: Array.from({length:7}, defaultDay), cycle: false, sick: false }; }
 
 function getWeek(w) {
   const key = 'w' + w;
@@ -411,7 +426,14 @@ function getWeek(w) {
   // backfill in case of older/partial data
   const wk = data.weeks[key];
   if (!wk.days) wk.days = Array.from({length:7}, defaultDay);
-  wk.days.forEach(d => { if (!d.slots) d.slots = [defaultSlot(), defaultSlot()]; });
+  if (wk.sick === undefined) wk.sick = false;
+  wk.days.forEach(d => {
+    if (!d.slots) d.slots = [defaultSlot(), defaultSlot()];
+    // migrate old numeric (1-10) sommeil/hydratation to boolean, and old 'stretching' type to 'yoga'
+    if (typeof d.sommeil === 'number') d.sommeil = d.sommeil >= 6;
+    if (typeof d.hydratation === 'number') d.hydratation = d.hydratation >= 6;
+    d.slots.forEach(s => { if (s.type === 'stretching') s.type = 'yoga'; });
+  });
   return wk;
 }
 
@@ -444,7 +466,7 @@ function parseNum(v) {
 function isSlotValidated(slot) {
   if (!slot.type) return false;
   const cfg = ACTIVITY_TYPES[slot.type];
-  if (cfg.kind === 'check') return !!slot.done;
+  if (cfg.kind === 'check' || cfg.kind === 'check_duration') return !!slot.done;
   return parseNum(slot.duree) > 0 || parseNum(slot.km) > 0;
 }
 
@@ -452,7 +474,7 @@ function computeWeekMinutes(wk) {
   let total = 0;
   wk.days.forEach(d => {
     d.slots.forEach(s => {
-      if ((s.type === 'run_ext' || s.type === 'tapis') && isSlotValidated(s)) {
+      if ((s.type === 'run_ext' || s.type === 'tapis' || s.type === 'renfo' || s.type === 'yoga') && parseNum(s.duree) > 0) {
         total += parseNum(s.duree);
       }
     });
@@ -469,19 +491,17 @@ function formatDuration(totalMin) {
 
 function computeWeekStats(wk) {
   let count = 0;
-  const sommeilVals = [], hydraVals = [];
+  let sommeilCount = 0, hydraCount = 0;
   wk.days.forEach(d => {
     d.slots.forEach(s => { if (isSlotValidated(s) && s.type !== 'repos') count++; });
-    if (d.sommeil !== null && d.sommeil !== undefined) sommeilVals.push(d.sommeil);
-    if (d.hydratation !== null && d.hydratation !== undefined) hydraVals.push(d.hydratation);
+    if (d.sommeil) sommeilCount++;
+    if (d.hydratation) hydraCount++;
   });
-  const avgSommeil = sommeilVals.length ? sommeilVals.reduce((a,b)=>a+b,0)/sommeilVals.length : 0;
-  const avgHydra = hydraVals.length ? hydraVals.reduce((a,b)=>a+b,0)/hydraVals.length : 0;
   const pass1 = count >= 5;
-  const pass2 = avgSommeil >= 6.5;
-  const pass3 = avgHydra >= 7;
-  const hasAnyData = count > 0 || sommeilVals.length > 0 || hydraVals.length > 0;
-  return { count, avgSommeil, avgHydra, pass1, pass2, pass3, success: pass1 && pass2 && pass3, hasAnyData };
+  const pass2 = sommeilCount >= 7;
+  const pass3 = hydraCount >= 7;
+  const hasAnyData = count > 0 || sommeilCount > 0 || hydraCount > 0;
+  return { count, sommeilCount, hydraCount, pass1, pass2, pass3, success: pass1 && pass2 && pass3, hasAnyData };
 }
 
 // ===================== WEEK NAV =====================
@@ -498,6 +518,7 @@ function changeWeek(delta) {
 function renderSport() {
   const wk = getWeek(currentWeek);
   document.getElementById('cycle-toggle').checked = !!wk.cycle;
+  document.getElementById('sick-toggle').checked = !!wk.sick;
   renderRings(wk);
   renderDaysGrid(wk);
 }
@@ -506,16 +527,16 @@ function renderRings(wk) {
   const stats = computeWeekStats(wk);
   const circumferences = { ring1: 2*Math.PI*58, ring2: 2*Math.PI*46, ring3: 2*Math.PI*34 };
   const pct1 = Math.min(stats.count/5, 1);
-  const pct2 = Math.min(stats.avgSommeil/10, 1);
-  const pct3 = Math.min(stats.avgHydra/10, 1);
+  const pct2 = stats.sommeilCount/7;
+  const pct3 = stats.hydraCount/7;
 
   setRing('ring1', circumferences.ring1, pct1);
   setRing('ring2', circumferences.ring2, pct2);
   setRing('ring3', circumferences.ring3, pct3);
 
   document.getElementById('legend1-val').textContent = stats.count + '/5';
-  document.getElementById('legend2-val').textContent = (stats.avgSommeil ? stats.avgSommeil.toFixed(1) : '—') + '/10';
-  document.getElementById('legend3-val').textContent = (stats.avgHydra ? stats.avgHydra.toFixed(1) : '—') + '/10';
+  document.getElementById('legend2-val').textContent = stats.sommeilCount + '/7';
+  document.getElementById('legend3-val').textContent = stats.hydraCount + '/7';
 
   setLegendPass('legend1', stats.pass1);
   setLegendPass('legend2', stats.pass2);
@@ -564,6 +585,11 @@ function toggleCycle(checked) {
   wk.cycle = checked;
   save();
 }
+function toggleSick(checked) {
+  const wk = getWeek(currentWeek);
+  wk.sick = checked;
+  save();
+}
 
 function renderDaysGrid(wk) {
   const grid = document.getElementById('days-grid');
@@ -590,13 +616,13 @@ function renderDaysGrid(wk) {
     metrics.innerHTML = `
       <div class="metric-item">
         <span class="metric-icon">🌙</span>
-        <input type="range" min="1" max="10" step="1" class="metric-slider" value="${day.sommeil || 5}" oninput="updateMetric(${dayIdx},'sommeil',this.value)">
-        <span class="metric-val">${day.sommeil !== null && day.sommeil !== undefined ? day.sommeil : '—'}</span>
+        <span class="metric-label">7h de sommeil</span>
+        <button class="metric-check${day.sommeil ? ' checked' : ''}" onclick="toggleMetric(${dayIdx},'sommeil')"></button>
       </div>
       <div class="metric-item">
         <span class="metric-icon">💧</span>
-        <input type="range" min="1" max="10" step="1" class="metric-slider" value="${day.hydratation || 5}" oninput="updateMetric(${dayIdx},'hydratation',this.value)">
-        <span class="metric-val">${day.hydratation !== null && day.hydratation !== undefined ? day.hydratation : '—'}</span>
+        <span class="metric-label">1,5L d'eau</span>
+        <button class="metric-check${day.hydratation ? ' checked' : ''}" onclick="toggleMetric(${dayIdx},'hydratation')"></button>
       </div>
     `;
     card.appendChild(metrics);
@@ -624,6 +650,18 @@ function renderSlotRow(dayIdx, slotIdx, slot) {
     btn.style.marginLeft = 'auto';
     btn.onclick = () => toggleSlotDone(dayIdx, slotIdx);
     row.appendChild(btn);
+  } else if (cfg.kind === 'check_duration') {
+    const fields = document.createElement('div');
+    fields.className = 'slot-fields';
+    fields.innerHTML = `
+      <input class="field-input" type="text" inputmode="decimal" placeholder="0" value="${slot.duree}" onchange="updateSlotField(${dayIdx},${slotIdx},'duree',this.value)">
+      <span class="field-unit">min</span>
+    `;
+    row.appendChild(fields);
+    const btn = document.createElement('button');
+    btn.className = 'slot-check' + (slot.done ? ' checked' : '');
+    btn.onclick = () => toggleSlotDone(dayIdx, slotIdx);
+    row.appendChild(btn);
   } else {
     const fields = document.createElement('div');
     fields.className = 'slot-fields';
@@ -638,14 +676,14 @@ function renderSlotRow(dayIdx, slotIdx, slot) {
   return row;
 }
 
-function updateMetric(dayIdx, field, val) {
+function toggleMetric(dayIdx, field) {
   const wk = getWeek(currentWeek);
-  wk.days[dayIdx][field] = parseInt(val, 10);
+  wk.days[dayIdx][field] = !wk.days[dayIdx][field];
   save();
   renderRings(wk);
   const card = document.getElementById('days-grid').children[dayIdx];
-  const valEl = card.querySelectorAll('.metric-val')[field === 'sommeil' ? 0 : 1];
-  valEl.textContent = val;
+  const btn = card.querySelectorAll('.metric-check')[field === 'sommeil' ? 0 : 1];
+  btn.classList.toggle('checked', wk.days[dayIdx][field]);
 }
 
 function updateSlotField(dayIdx, slotIdx, field, val) {
@@ -725,12 +763,12 @@ function renderStatsPage() {
     row.onclick = () => { currentWeek = w; save(); showPage('sport', document.querySelector('.nav-btn')); document.getElementById('week-label').textContent='Semaine '+w; renderSport(); };
     row.innerHTML = `
       <div class="recap-content">
-        <div class="recap-week">Semaine ${w}${wk && wk.cycle ? '<span class="cycle-flag"><span class="cycle-dot"></span>cycle</span>' : ''}</div>
+        <div class="recap-week">Semaine ${w}${wk && wk.cycle ? '<span class="cycle-flag"><span class="cycle-dot"></span>cycle</span>' : ''}${wk && wk.sick ? '<span class="sick-flag"><span class="sick-dot"></span>malade</span>' : ''}</div>
         <div class="recap-title">${statusLabel}</div>
         ${stats.hasAnyData ? `<div class="recap-detail">
           <span>${stats.count}/5 activ.</span>
-          <span>${stats.avgSommeil ? stats.avgSommeil.toFixed(1) : '—'} sommeil</span>
-          <span>${stats.avgHydra ? stats.avgHydra.toFixed(1) : '—'} hydrat.</span>
+          <span>${stats.sommeilCount}/7 sommeil</span>
+          <span>${stats.hydraCount}/7 hydrat.</span>
         </div>` : ''}
       </div>
       <div class="recap-badge ${badgeClass}">${badgeText}</div>
@@ -799,6 +837,8 @@ function calDaySymbol(shape, num, isToday) {
     shapeEl = `<rect x="3" y="3" width="22" height="22" rx="3" fill="none" stroke="${stroke}" stroke-width="${sw}"/>`;
   } else if (shape === 'renfo') {
     shapeEl = `<polygon points="14,2 26,24 2,24" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+  } else if (shape === 'yoga') {
+    shapeEl = `<circle cx="14" cy="14" r="11" fill="none" stroke="${stroke}" stroke-width="${sw}"/>`;
   }
   return `<svg width="28" height="28" viewBox="0 0 28 28">${shapeEl}<text x="14" y="18" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="10.5" font-weight="${fontWeight}" fill="#4A3B34">${num}</text></svg>`;
 }
