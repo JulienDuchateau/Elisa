@@ -51,7 +51,7 @@
 
   /* WEEK / MONTH SELECTOR */
   .week-selector { display: flex; align-items: center; gap: 10px; padding: 0 14px 12px; background: var(--bg); }
-  .week-arrow { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--card); color: var(--clay); font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; border: 1px solid var(--border); }
+  .week-arrow { width: 42px; height: 42px; border-radius: 50%; border: none; background: var(--card); color: var(--clay); font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; border: 1px solid var(--border); }
   .week-label { flex: 1; text-align: center; font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px; letter-spacing: 0.01em; color: var(--text); }
 
   /* SECTION */
@@ -99,12 +99,12 @@
   .day-top { display: flex; align-items: flex-start; gap: 10px; }
   .day-name { font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; color: var(--soft); width: 28px; flex-shrink: 0; padding-top: 5px; }
   .day-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 7px; }
-  .slot-row { display: flex; align-items: center; gap: 8px; min-height: 26px; }
+  .slot-row { display: flex; align-items: center; gap: 8px; min-height: 26px; flex-wrap: wrap; row-gap: 4px; }
   .slot-add-btn { font-family: 'DM Sans', sans-serif; font-size: 11.5px; color: var(--muted); cursor: pointer; padding: 2px 0; border: none; background: none; }
-  .slot-fields { display: flex; align-items: center; gap: 5px; margin-left: auto; flex-shrink: 0; }
-  .field-input { font-family: 'DM Sans', sans-serif; font-size: 12px; background: transparent; border: none; border-bottom: 1.5px solid var(--border); outline: none; padding: 1px 0; text-align: right; color: var(--text); width: 34px; }
+  .slot-fields { display: flex; align-items: center; gap: 4px; margin-left: auto; flex-shrink: 0; }
+  .field-input { font-family: 'DM Sans', sans-serif; font-size: 12px; background: transparent; border: none; border-bottom: 1.5px solid var(--border); outline: none; padding: 1px 0; text-align: right; color: var(--text); width: 30px; }
   .field-input:focus { border-bottom-color: var(--clay); }
-  .field-unit { font-family: 'DM Sans', sans-serif; font-size: 10px; color: var(--muted); flex-shrink: 0; }
+  .field-unit { font-family: 'DM Sans', sans-serif; font-size: 9.5px; color: var(--muted); flex-shrink: 0; }
   .slot-check { width: 21px; height: 21px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
   .slot-check.checked { background: var(--clay); border-color: var(--clay); }
   .slot-remove { font-size: 13px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 0 2px; flex-shrink: 0; }
@@ -118,13 +118,13 @@
   .badge-repos { background: #F0E9DF; color: var(--muted); }
 
   /* SLIDERS ROW */
-  .day-metrics { display: flex; gap: 14px; margin-top: 2px; padding-top: 9px; border-top: 1px solid var(--border); margin-left: 38px; }
-  .metric-item { flex: 1; display: flex; align-items: center; gap: 7px; }
-  .metric-icon { font-size: 13px; flex-shrink: 0; width: 14px; text-align: center; }
-  .metric-slider { flex: 1; -webkit-appearance: none; appearance: none; height: 3px; border-radius: 2px; background: var(--border); outline: none; }
+  .day-metrics { display: flex; gap: 10px; margin-top: 2px; padding-top: 9px; border-top: 1px solid var(--border); margin-left: 38px; }
+  .metric-item { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
+  .metric-icon { font-size: 13px; flex-shrink: 0; width: 13px; text-align: center; }
+  .metric-slider { flex: 1; min-width: 0; width: 100%; -webkit-appearance: none; appearance: none; height: 3px; border-radius: 2px; background: var(--border); outline: none; }
   .metric-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--clay); cursor: pointer; }
   .metric-slider::-moz-range-thumb { width: 14px; height: 14px; border: none; border-radius: 50%; background: var(--clay); cursor: pointer; }
-  .metric-val { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--soft); width: 16px; text-align: right; flex-shrink: 0; }
+  .metric-val { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--soft); width: 14px; text-align: right; flex-shrink: 0; }
 
   /* RECAP / STATS LIST */
   .recap-list { display: flex; flex-direction: column; gap: 9px; }
