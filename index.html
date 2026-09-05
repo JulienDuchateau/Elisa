@@ -74,6 +74,14 @@
   .ring-check { font-size: 11px; margin-left: 3px; color: var(--clay); }
   @keyframes ringPulse { 0% { transform: scale(1); } 35% { transform: scale(1.07); } 100% { transform: scale(1); } }
   .ring-pulse { animation: ringPulse 0.5s ease; }
+  .ring-glow-1 { filter: drop-shadow(0 0 6px rgba(201,123,84,0.6)); }
+  .ring-glow-2 { filter: drop-shadow(0 0 6px rgba(138,155,110,0.6)); }
+  .ring-glow-3 { filter: drop-shadow(0 0 6px rgba(227,168,87,0.6)); }
+
+  .week-celebration { display: none; align-items: center; justify-content: center; gap: 7px; margin: 0 0 14px; padding: 9px 14px; border-radius: 999px; background: linear-gradient(135deg, var(--clay-soft), var(--honey-soft)); color: var(--text); font-family: 'Fraunces', serif; font-style: italic; font-size: 13.5px; font-weight: 500; text-align: center; }
+  .week-celebration.visible { display: flex; }
+  @keyframes celebrationPop { 0% { opacity: 0; transform: scale(0.92) translateY(4px); } 55% { opacity: 1; transform: scale(1.03); } 100% { opacity: 1; transform: scale(1); } }
+  .week-celebration.pop { animation: celebrationPop 0.55s ease; }
 
   .cycle-row { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; margin-top: 4px; border-top: 1px solid var(--border); }
   .cycle-label { font-size: 13px; color: var(--text); }
@@ -223,6 +231,7 @@
 
   <div class="block">
     <div class="section-title">Accomplissement de la semaine</div>
+    <div class="week-celebration" id="week-celebration"><span>✨</span> Belle semaine !</div>
     <div class="rings-wrap">
       <svg class="rings-svg" viewBox="0 0 132 132" id="rings-svg">
         <defs>
@@ -511,8 +520,17 @@ function renderRings(wk) {
   setLegendPass('legend1', stats.pass1);
   setLegendPass('legend2', stats.pass2);
   setLegendPass('legend3', stats.pass3);
+  updateCelebration(stats.success);
 
   document.getElementById('time-total-val').textContent = formatDuration(computeWeekMinutes(wk));
+}
+function updateCelebration(success) {
+  const el = document.getElementById('week-celebration');
+  const wasVisible = el.classList.contains('visible');
+  el.classList.toggle('visible', success);
+  if (success && !wasVisible) {
+    el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+  }
 }
 function setRing(id, circumference, pct) {
   const el = document.getElementById(id);
@@ -520,6 +538,7 @@ function setRing(id, circumference, pct) {
   const nowFull = pct >= 1;
   el.setAttribute('stroke-dasharray', circumference.toFixed(2));
   el.setAttribute('stroke-dashoffset', (circumference * (1-pct)).toFixed(2));
+  el.classList.toggle('ring-glow-' + id.slice(-1), nowFull);
   if (nowFull && !wasFull) {
     el.classList.remove('ring-pulse'); void el.offsetWidth; el.classList.add('ring-pulse');
   }
