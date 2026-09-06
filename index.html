@@ -25,9 +25,9 @@
     --plum: #8B5A6B;
     --plum-soft: #F0DFE4;
     --slate: #7D8C93;
-    --ring1: #C97B54;
-    --ring2: #8A9B6E;
-    --ring3: #E3A857;
+    --ring1: var(--clay);
+    --ring2: var(--sage);
+    --ring3: var(--honey);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; overflow-x: hidden; }
@@ -117,7 +117,6 @@
   .field-unit { font-family: 'DM Sans', sans-serif; font-size: 9.5px; color: var(--muted); flex-shrink: 0; }
   .slot-check { width: 21px; height: 21px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; cursor: pointer; flex-shrink: 0; transition: all 0.15s; }
   .slot-check.checked { background: var(--clay); border-color: var(--clay); }
-  .slot-remove { font-size: 13px; color: var(--muted); background: none; border: none; cursor: pointer; padding: 0 2px; flex-shrink: 0; }
 
   /* SEANCE BADGE */
   .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 11px; border-radius: 999px; font-size: 11px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; flex-shrink: 0; }
@@ -128,13 +127,12 @@
   .badge-repos { background: #F0E9DF; color: var(--muted); }
 
   /* DAILY METRICS (sommeil / hydratation on-off) */
-  .day-metrics { display: flex; gap: 10px; margin-top: 2px; padding-top: 9px; border-top: 1px solid var(--border); margin-left: 38px; }
-  .metric-item { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 3px 0; -webkit-tap-highlight-color: transparent; }
-  .metric-icon { font-size: 13px; flex-shrink: 0; width: 13px; text-align: center; }
-  .metric-label { flex: 1; min-width: 0; font-size: 10.5px; color: var(--soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.15s; }
-  .metric-item.checked .metric-label { color: var(--clay); font-weight: 500; }
-  .metric-check { width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; flex-shrink: 0; transition: all 0.15s; display: inline-block; }
-  .metric-check.checked { background: var(--clay); border-color: var(--clay); }
+  .day-metrics { display: flex; gap: 8px; margin-top: 2px; padding-top: 9px; border-top: 1px solid var(--border); margin-left: 38px; }
+  .metric-item { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; padding: 6px 8px; border-radius: 999px; border: 1.5px solid var(--border); background: transparent; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+  .metric-item.checked { border-color: var(--clay); background: var(--clay-soft); }
+  .metric-icon { font-size: 13px; flex-shrink: 0; }
+  .metric-label { min-width: 0; font-size: 10.5px; color: var(--soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.15s; }
+  .metric-item.checked .metric-label { color: #A15A34; font-weight: 600; }
 
   /* RECAP / STATS LIST */
   .recap-list { display: flex; flex-direction: column; gap: 9px; }
@@ -158,7 +156,6 @@
   .recap-badge-empty { background: #F0E9DF; color: var(--muted); }
 
   /* CALENDRIER */
-  .cal-month-name { font-family: 'Fraunces', serif; font-weight: 500; font-size: 19px; color: var(--text); margin-bottom: 12px; text-align: center; }
   .cal-grid-header { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 6px; }
   .cal-grid-header span { font-family: 'DM Sans', sans-serif; font-size: 10px; color: var(--muted); text-align: center; letter-spacing: 0.04em; }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
@@ -229,7 +226,7 @@
 
   <div class="week-selector">
     <button class="week-arrow" onclick="changeWeek(-1)">‹</button>
-    <div class="week-label" id="week-label">SEMAINE 1</div>
+    <div class="week-label" id="week-label">Semaine 1</div>
     <button class="week-arrow" onclick="changeWeek(1)">›</button>
   </div>
 
@@ -331,7 +328,7 @@
   </div>
   <div class="week-selector">
     <button class="week-arrow" onclick="changeMonth(-1)">‹</button>
-    <div class="week-label" id="cal-month-label">MOIS</div>
+    <div class="week-label" id="cal-month-label">Mois</div>
     <button class="week-arrow" onclick="changeMonth(1)">›</button>
   </div>
   <div class="section">
@@ -618,12 +615,10 @@ function renderDaysGrid(wk) {
       <div class="metric-item${day.sommeil ? ' checked' : ''}" onclick="toggleMetric(${dayIdx},'sommeil')">
         <span class="metric-icon">🌙</span>
         <span class="metric-label">7h de sommeil</span>
-        <span class="metric-check${day.sommeil ? ' checked' : ''}"></span>
       </div>
       <div class="metric-item${day.hydratation ? ' checked' : ''}" onclick="toggleMetric(${dayIdx},'hydratation')">
         <span class="metric-icon">💧</span>
         <span class="metric-label">1,5L d'eau</span>
-        <span class="metric-check${day.hydratation ? ' checked' : ''}"></span>
       </div>
     `;
     card.appendChild(metrics);
@@ -684,9 +679,7 @@ function toggleMetric(dayIdx, field) {
   renderRings(wk);
   const card = document.getElementById('days-grid').children[dayIdx];
   const idx = field === 'sommeil' ? 0 : 1;
-  const isOn = wk.days[dayIdx][field];
-  card.querySelectorAll('.metric-item')[idx].classList.toggle('checked', isOn);
-  card.querySelectorAll('.metric-check')[idx].classList.toggle('checked', isOn);
+  card.querySelectorAll('.metric-item')[idx].classList.toggle('checked', wk.days[dayIdx][field]);
 }
 
 function updateSlotField(dayIdx, slotIdx, field, val) {
@@ -782,11 +775,6 @@ function renderStatsPage() {
 }
 
 // ===================== RENDER: CALENDRIER =====================
-function dateForWeekDay(w, dayIdx) {
-  const d = new Date(WEEK1_START);
-  d.setDate(d.getDate() + (w-1)*7 + dayIdx);
-  return d;
-}
 function weekDayForDate(date) {
   const diffDays = Math.round((date - WEEK1_START) / 86400000);
   const w = Math.floor(diffDays/7) + 1;
